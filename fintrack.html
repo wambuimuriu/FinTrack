@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FinTrack — Enterprise Finance</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0d0f12;
+  --surface:#14171c;
+  --surface2:#1a1e25;
+  --border:#252a33;
+  --border2:#2e3542;
+  --text:#e8eaf0;
+  --muted:#7a8394;
+  --dim:#4a5568;
+  --blue:#3b82f6;
+  --blue-dim:#1e3a5f;
+  --blue-glow:rgba(59,130,246,0.15);
+  --green:#22c55e;
+  --green-dim:#14532d;
+  --amber:#f59e0b;
+  --amber-dim:#451a03;
+  --red:#ef4444;
+  --red-dim:#450a0a;
+  --purple:#a78bfa;
+  --r:8px;
+  --r2:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sb{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.logo{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.logo-icon{width:32px;height:32px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:16px;height:16px;fill:#fff}
+.logo-text{font-size:15px;font-weight:600;letter-spacing:-0.3px}
+.logo-text span{color:var(--blue)}
+.nav{padding:12px 8px;flex:1;display:flex;flex-direction:column;gap:2px}
+.ni{padding:9px 10px;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px;font-weight:400;transition:all 0.15s;position:relative}
+.ni:hover{background:var(--surface2);color:var(--text)}
+.ni.on{background:var(--blue-glow);color:var(--blue);font-weight:500;border:1px solid rgba(59,130,246,0.2)}
+.ni svg{width:15px;height:15px;flex-shrink:0}
+.nbadge{background:var(--red);color:#fff;border-radius:99px;font-size:10px;font-weight:600;padding:1px 6px;margin-left:auto;font-family:'DM Mono',monospace}
+.sb-user{padding:12px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:9px}
+.av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.av-name{font-size:12px;font-weight:500}
+.av-role{font-size:10px;color:var(--muted)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar h1{font-size:15px;font-weight:500;letter-spacing:-0.2px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.quarter-tag{background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:4px 12px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
+.btn{border:1px solid var(--border2);background:transparent;color:var(--text);border-radius:var(--r);padding:7px 14px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all 0.15s}
+.btn:hover{background:var(--surface2);border-color:var(--blue)}
+.btn-primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn-primary:hover{background:#2563eb;border-color:#2563eb}
+.btn-green{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--green)}
+.btn-green:hover{background:rgba(34,197,94,0.2)}
+.btn-red{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--red)}
+.btn-red:hover{background:rgba(239,68,68,0.2)}
+
+.scroll{flex:1;overflow-y:auto;padding:20px 22px}
+.scroll::-webkit-scrollbar{width:4px}
+.scroll::-webkit-scrollbar-track{background:transparent}
+.scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+.page{display:none}
+.page.on{display:block}
+
+/* METRICS */
+.mets{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.met{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:16px;position:relative;overflow:hidden}
+.met::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.met-blue::before{background:var(--blue)}
+.met-green::before{background:var(--green)}
+.met-amber::before{background:var(--amber)}
+.met-purple::before{background:var(--purple)}
+.ml{font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:500;letter-spacing:0.3px;text-transform:uppercase}
+.mv{font-size:24px;font-weight:600;letter-spacing:-0.5px;font-family:'DM Mono',monospace}
+.ms{font-size:11px;color:var(--dim);margin-top:4px}
+.mv-blue{color:var(--blue)}
+.mv-green{color:var(--green)}
+.mv-amber{color:var(--amber)}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:14px}
+.card-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:14px}
+.twoc{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+
+/* TABLE ROWS */
+.trow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.trow:last-child{border-bottom:none}
+.trow-label{color:var(--muted);font-size:12px}
+.trow-val{font-weight:500;font-family:'DM Mono',monospace;font-size:12px}
+
+/* PILLS */
+.pill{font-size:10px;padding:3px 8px;border-radius:99px;font-weight:600;letter-spacing:0.2px}
+.pi{background:rgba(245,158,11,0.15);color:var(--amber);border:1px solid rgba(245,158,11,0.3)}
+.pa{background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.25)}
+.pr{background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25)}
+.pv{background:rgba(59,130,246,0.12);color:var(--blue);border:1px solid rgba(59,130,246,0.25)}
+
+/* PROGRESS */
+.prog{height:4px;background:var(--surface2);border-radius:99px;overflow:hidden;margin-top:5px}
+.pf{height:100%;border-radius:99px;transition:width 0.5s ease}
+
+/* CHART BARS */
+.chart-wrap{display:flex;align-items:flex-end;gap:6px;height:90px;margin-bottom:8px}
+.bc{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;transition:height 0.4s ease}
+.bl{font-size:9px;color:var(--dim);font-family:'DM Mono',monospace}
+
+/* APPROVAL CARDS */
+.acard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px;margin-bottom:10px;transition:border-color 0.2s}
+.acard:hover{border-color:var(--border2)}
+.acard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.acard-title{font-size:13px;font-weight:500}
+.acard-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.acard-amount{font-size:16px;font-weight:600;color:var(--blue);font-family:'DM Mono',monospace;text-align:right}
+.acard-desc{font-size:12px;color:var(--dim);margin-bottom:10px;line-height:1.6}
+.steps{display:flex;align-items:center;margin-bottom:12px}
+.sdot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;font-family:'DM Mono',monospace;border:1px solid}
+.sline{flex:1;height:1px}
+.sline-done{background:var(--green)}
+.sline-pend{background:var(--border)}
+.step-label{font-size:9px;color:var(--muted);margin-top:3px;text-align:center;white-space:nowrap}
+.step-col{display:flex;flex-direction:column;align-items:center;gap:2px}
+.acard-actions{display:flex;gap:8px}
+
+/* FILTER BTNS */
+.filters{display:flex;gap:8px;margin-bottom:14px}
+
+/* FORM */
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.fl{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.3px}
+.inp{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%;transition:border-color 0.15s}
+.inp:focus{outline:none;border-color:var(--blue)}
+.inp::placeholder{color:var(--dim)}
+select.inp option{background:var(--surface2)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:10px 16px;font-size:12px;color:var(--text);display:none;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:slideUp 0.2s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* DEPT BADGE */
+.dept-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* REPORT ROW */
+.report-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.report-row:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sb">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 20 20"><path d="M2 10h16M2 6h12M2 14h8" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      </div>
+      <div class="logo-text">Fin<span>Track</span></div>
+    </div>
+    <div class="nav">
+      <div class="ni on" onclick="nav('dash',this)">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="7" height="7" rx="1"/><rect x="11" y="2" width="7" height="7" rx="1"/><rect x="2" y="11" width="7" height="7" rx="1"/><rect x="11" y="11" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </div>
+      <div class="ni" onclick="nav('approvals',this)">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><path d="M6.5 10l2.5 2.5 4-4" stroke-linecap="round"/></svg>
+        Approvals
+        <span class="nbadge" id="nbadge">3</span>
+      </div>
+      <div class="ni" onclick="nav('budget',this)">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="16" height="12" rx="1"/><path d="M6 6V5a4 4 0 018 0v1" stroke-linecap="round"/></svg>
+        Budget
+      </div>
+      <div class="ni" onclick="nav('expenses',this)">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5h14M3 10h10M3 15h6" stroke-linecap="round"/></svg>
+        Expenses
+      </div>
+      <div class="ni" onclick="nav('reports',this)">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 16V10M7 16V6M11 16V11M15 16V7" stroke-linecap="round"/></svg>
+        Reports
+      </div>
+    </div>
+    <div class="sb-user">
+      <div class="av">JM</div>
+      <div>
+        <div class="av-name">Jane Mwangi</div>
+        <div class="av-role">CFO · Admin</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <h1 id="ptitle">Dashboard</h1>
+      <div class="topbar-right">
+        <span class="quarter-tag">Q2 · 2025</span>
+        <button class="btn btn-primary" onclick="toast('Expense form → coming in v1.1')">+ New request</button>
+      </div>
+    </div>
+
+    <div class="scroll">
+
+      <!-- DASHBOARD -->
+      <div class="page on" id="pg-dash">
+        <div class="mets">
+          <div class="met met-blue">
+            <div class="ml">Total budget</div>
+            <div class="mv">$2.40M</div>
+            <div class="ms">FY Q2 2025</div>
+          </div>
+          <div class="met met-green">
+            <div class="ml">Spent to date</div>
+            <div class="mv mv-blue">$1.10M</div>
+            <div class="ms">46% utilised</div>
+          </div>
+          <div class="met met-amber">
+            <div class="ml">Pending approvals</div>
+            <div class="mv mv-amber" id="dp">3</div>
+            <div class="ms">Avg wait: 2.4 days</div>
+          </div>
+          <div class="met met-purple">
+            <div class="ml">Forecast variance</div>
+            <div class="mv mv-green">+$84K</div>
+            <div class="ms">Under budget ✓</div>
+          </div>
+        </div>
+
+        <div class="twoc">
+          <div class="card">
+            <div class="card-title">Monthly spend (Q2)</div>
+            <div class="chart-wrap">
+              <div class="bc"><div class="bar" style="height:60%;background:#3b82f6;opacity:0.5"></div><div class="bl">Jan</div></div>
+              <div class="bc"><div class="bar" style="height:74%;background:#3b82f6;opacity:0.5"></div><div class="bl">Feb</div></div>
+              <div class="bc"><div class="bar" style="height:51%;background:#3b82f6;opacity:0.5"></div><div class="bl">Mar</div></div>
+              <div class="bc"><div class="bar" style="height:46%;background:#3b82f6"></div><div class="bl">Apr</div></div>
+              <div class="bc"><div class="bar" style="height:16%;background:#252a33"></div><div class="bl">May</div></div>
+              <div class="bc"><div class="bar" style="height:16%;background:#252a33"></div><div class="bl">Jun</div></div>
+            </div>
+            <div style="display:flex;gap:14px;font-size:10px;color:var(--muted)">
+              <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;background:#3b82f6;border-radius:2px;display:inline-block"></span>Actual</span>
+              <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;background:#252a33;border:1px solid var(--border2);border-radius:2px;display:inline-block"></span>Projected</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Recent requests</div>
+            <div class="trow">
+              <div><div style="font-weight:500;font-size:13px">AWS infrastructure</div><div class="trow-label">Engineering · $42,000</div></div>
+              <span class="pill pa">Approved</span>
+            </div>
+            <div class="trow">
+              <div><div style="font-weight:500;font-size:13px">Marketing summit</div><div class="trow-label">Marketing · $18,500</div></div>
+              <span class="pill pi">Pending</span>
+            </div>
+            <div class="trow">
+              <div><div style="font-weight:500;font-size:13px">Contractor fees</div><div class="trow-label">HR · $9,200</div></div>
+              <span class="pill pv">In review</span>
+            </div>
+            <div style="margin-top:12px"><button class="btn" onclick="nav('approvals',document.querySelectorAll('.ni')[1])">View all approvals →</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Budget by department</div>
+          <div class="trow">
+            <span style="min-width:100px">Engineering</span>
+            <div style="flex:1;padding:0 16px">
+              <div style="display:flex;justify-content:flex-end;font-size:11px;color:var(--muted);margin-bottom:3px;font-family:'DM Mono',monospace">$520K / $900K</div>
+              <div class="prog"><div class="pf" style="width:58%;background:var(--blue)"></div></div>
+            </div>
+            <span class="pill pa">On track</span>
+          </div>
+          <div class="trow">
+            <span style="min-width:100px">Marketing</span>
+            <div style="flex:1;padding:0 16px">
+              <div style="display:flex;justify-content:flex-end;font-size:11px;color:var(--muted);margin-bottom:3px;font-family:'DM Mono',monospace">$310K / $400K</div>
+              <div class="prog"><div class="pf" style="width:78%;background:var(--amber)"></div></div>
+            </div>
+            <span class="pill pi">At risk</span>
+          </div>
+          <div class="trow">
+            <span style="min-width:100px">Operations</span>
+            <div style="flex:1;padding:0 16px">
+              <div style="display:flex;justify-content:flex-end;font-size:11px;color:var(--muted);margin-bottom:3px;font-family:'DM Mono',monospace">$180K / $600K</div>
+              <div class="prog"><div class="pf" style="width:30%;background:var(--green)"></div></div>
+            </div>
+            <span class="pill pa">On track</span>
+          </div>
+          <div class="trow">
+            <span style="min-width:100px">HR</span>
+            <div style="flex:1;padding:0 16px">
+              <div style="display:flex;justify-content:flex-end;font-size:11px;color:var(--muted);margin-bottom:3px;font-family:'DM Mono',monospace">$95K / $200K</div>
+              <div class="prog"><div class="pf" style="width:47%;background:var(--blue)"></div></div>
+            </div>
+            <span class="pill pa">On track</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPROVALS -->
+      <div class="page" id="pg-approvals">
+        <div class="filters">
+          <button class="btn btn-primary" id="fa" onclick="setF('all',this)">All requests</button>
+          <button class="btn" id="fp" onclick="setF('pending',this)">Pending</button>
+          <button class="btn" id="fr" onclick="setF('review',this)">In review</button>
+          <button class="btn" id="fap" onclick="setF('approved',this)">Approved</button>
+        </div>
+        <div id="alist"></div>
+      </div>
+
+      <!-- BUDGET -->
+      <div class="page" id="pg-budget">
+        <div class="card">
+          <div class="card-title">Add budget line</div>
+          <div class="frow">
+            <div><div class="fl">Department</div><select class="inp" id="bdept"><option>Engineering</option><option>Marketing</option><option>Operations</option><option>HR</option><option>Finance</option></select></div>
+            <div><div class="fl">Category</div><select class="inp"><option>Software</option><option>Travel</option><option>Headcount</option><option>Infrastructure</option><option>Events</option></select></div>
+          </div>
+          <div class="frow">
+            <div><div class="fl">Amount (USD)</div><input class="inp" type="number" id="bamt" placeholder="0.00"/></div>
+            <div><div class="fl">Quarter</div><select class="inp"><option>Q2 2025</option><option>Q3 2025</option><option>Q4 2025</option></select></div>
+          </div>
+          <button class="btn btn-primary" onclick="addBL()">Add budget line</button>
+        </div>
+        <div class="card" id="blines">
+          <div class="card-title">Active budget lines</div>
+          <div class="trow"><div style="font-weight:500">Engineering</div><div class="trow-label">Infrastructure · Q2</div><div class="trow-val">$900,000</div></div>
+          <div class="trow"><div style="font-weight:500">Marketing</div><div class="trow-label">Travel · Q2</div><div class="trow-val">$400,000</div></div>
+          <div class="trow"><div style="font-weight:500">Operations</div><div class="trow-label">Software · Q2</div><div class="trow-val">$600,000</div></div>
+          <div class="trow"><div style="font-weight:500">HR</div><div class="trow-label">Headcount · Q2</div><div class="trow-val">$200,000</div></div>
+        </div>
+      </div>
+
+      <!-- EXPENSES -->
+      <div class="page" id="pg-expenses">
+        <div class="card">
+          <div class="card-title">Submit new expense</div>
+          <div class="frow">
+            <div><div class="fl">Description</div><input class="inp" type="text" id="edesc" placeholder="e.g. AWS reserved instances"/></div>
+            <div><div class="fl">Amount (USD)</div><input class="inp" type="number" id="eamt" placeholder="0.00"/></div>
+          </div>
+          <div class="frow">
+            <div><div class="fl">Department</div><select class="inp" id="edept"><option>Engineering</option><option>Marketing</option><option>Operations</option><option>HR</option></select></div>
+            <div><div class="fl">Category</div><select class="inp"><option>Travel</option><option>Software</option><option>Equipment</option><option>Events</option><option>Contractor</option></select></div>
+          </div>
+          <button class="btn btn-primary" onclick="submitExp()">Submit for approval</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Expense history</div>
+          <div id="elist">
+            <div class="trow">
+              <div style="display:flex;align-items:center;gap:8px"><div class="dept-dot" style="background:#3b82f6"></div><div><div style="font-weight:500">AWS reserved instances</div><div class="trow-label">Engineering · Software</div></div></div>
+              <div style="text-align:right"><div class="trow-val">$42,000</div><span class="pill pa">Approved</span></div>
+            </div>
+            <div class="trow">
+              <div style="display:flex;align-items:center;gap:8px"><div class="dept-dot" style="background:#f59e0b"></div><div><div style="font-weight:500">Marketing summit venue</div><div class="trow-label">Marketing · Events</div></div></div>
+              <div style="text-align:right"><div class="trow-val">$18,500</div><span class="pill pi">Pending</span></div>
+            </div>
+            <div class="trow">
+              <div style="display:flex;align-items:center;gap:8px"><div class="dept-dot" style="background:#a78bfa"></div><div><div style="font-weight:500">Design contractor</div><div class="trow-label">Operations · Contractor</div></div></div>
+              <div style="text-align:right"><div class="trow-val">$9,200</div><span class="pill pv">In review</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="page" id="pg-reports">
+        <div class="twoc">
+          <div class="card">
+            <div class="card-title">Spend by department</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Engineering</span><span style="font-family:'DM Mono',monospace;color:var(--muted)">$520K</span></div>
+                <div class="prog"><div class="pf" style="width:47%;background:#3b82f6"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Marketing</span><span style="font-family:'DM Mono',monospace;color:var(--muted)">$310K</span></div>
+                <div class="prog"><div class="pf" style="width:28%;background:#a78bfa"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Operations</span><span style="font-family:'DM Mono',monospace;color:var(--muted)">$180K</span></div>
+                <div class="prog"><div class="pf" style="width:16%;background:#22c55e"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>HR</span><span style="font-family:'DM Mono',monospace;color:var(--muted)">$95K</span></div>
+                <div class="prog"><div class="pf" style="width:9%;background:#f59e0b"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Approval performance</div>
+            <div class="trow"><span class="trow-label">Avg approval time</span><span class="trow-val">2.4 days</span></div>
+            <div class="trow"><span class="trow-label">Approved this quarter</span><span class="trow-val" style="color:var(--green)">$1.08M</span></div>
+            <div class="trow"><span class="trow-label">Rejected requests</span><span class="trow-val" style="color:var(--red)">4</span></div>
+            <div class="trow"><span class="trow-label">Auto-approved (&lt;$500)</span><span class="trow-val">23</span></div>
+            <div class="trow"><span class="trow-label">Approval rate</span><span class="trow-val" style="color:var(--green)">91%</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Q2 budget summary</div>
+          <div class="trow"><span class="trow-label">Total budget</span><span class="trow-val">$2,400,000</span></div>
+          <div class="trow"><span class="trow-label">Spent to date</span><span class="trow-val">$1,105,000</span></div>
+          <div class="trow"><span class="trow-label">Committed (pending)</span><span class="trow-val" style="color:var(--amber)">$69,700</span></div>
+          <div class="trow"><span class="trow-label">Forecast remaining</span><span class="trow-val" style="color:var(--green)">$1,225,300</span></div>
+          <div style="margin-top:14px;display:flex;gap:8px">
+            <button class="btn" onclick="toast('Exporting CSV...')">Export CSV</button>
+            <button class="btn" onclick="toast('PDF export in v1.1')">Export PDF</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="tst"></div>
+
+<script>
+var approvals = [
+  {id:1,title:'Marketing summit',dept:'Marketing',amount:18500,status:'pending',by:'Alex K.',steps:['Submitted','Manager','Finance','CFO'],step:1,desc:'Annual marketing team summit — venue and travel for 12 people across 3 days.'},
+  {id:2,title:'Contractor fees Q2',dept:'HR',amount:9200,status:'review',by:'Dana Levin',steps:['Submitted','Manager','Finance','CFO'],step:2,desc:'3 senior design contractors for the Q2 product launch sprint (6 weeks).'},
+  {id:3,title:'SaaS tool renewal',dept:'Engineering',amount:6800,status:'pending',by:'Sam Tran',steps:['Submitted','Manager','Finance','CFO'],step:1,desc:'Annual renewal for Figma Enterprise and DataDog APM subscriptions.'}
+];
+var cf = 'all';
+
+function renderA() {
+  var list = approvals.filter(function(a){ return cf==='all' || a.status===cf; });
+  var h = '';
+  if(!list.length) {
+    h = '<div style="text-align:center;padding:3rem;color:var(--muted);font-size:13px">No requests in this view</div>';
+  }
+  list.forEach(function(a) {
+    var sc = a.status==='pending'?'pi':a.status==='review'?'pv':a.status==='approved'?'pa':'pr';
+    var sl = a.status==='pending'?'Pending':a.status==='review'?'In review':a.status==='approved'?'Approved':'Rejected';
+    var stH = '<div style="display:flex;align-items:flex-start;width:100%">';
+    a.steps.forEach(function(s,i){
+      var done=i<a.step, act=i===a.step;
+      var dotBg = done?'rgba(34,197,94,0.15)':act?'rgba(59,130,246,0.15)':'var(--surface2)';
+      var dotC = done?'var(--green)':act?'var(--blue)':'var(--dim)';
+      var dotB = done?'rgba(34,197,94,0.4)':act?'rgba(59,130,246,0.4)':'var(--border)';
+      stH += '<div class="step-col">';
+      stH += '<div class="sdot" style="background:'+dotBg+';color:'+dotC+';border-color:'+dotB+'">'+(done?'✓':(i+1))+'</div>';
+      stH += '<div class="step-label">'+s+'</div></div>';
+      if(i<a.steps.length-1){
+        var lc = done?'sline-done':'sline-pend';
+        stH += '<div class="sline '+lc+'" style="margin-top:11px"></div>';
+      }
+    });
+    stH += '</div>';
+    h += '<div class="acard"><div class="acard-top">';
+    h += '<div><div class="acard-title">'+a.title+'</div><div class="acard-sub">'+a.dept+' · Submitted by '+a.by+'</div></div>';
+    h += '<div><div class="acard-amount">$'+a.amount.toLocaleString()+'</div><div style="text-align:right;margin-top:4px"><span class="pill '+sc+'">'+sl+'</span></div></div>';
+    h += '</div>';
+    h += '<div class="acard-desc">'+a.desc+'</div>';
+    h += stH;
+    h += '<div class="acard-actions" style="margin-top:10px">';
+    if(a.status!=='approved') h += '<button class="btn btn-green" onclick="approve('+a.id+')">Approve</button>';
+    if(a.status!=='approved') h += '<button class="btn btn-red" onclick="reject('+a.id+')">Reject</button>';
+    h += '<button class="btn" onclick="toast(\'Comment feature → v1.1\')">Comment</button>';
+    h += '</div></div>';
+  });
+  document.getElementById('alist').innerHTML = h;
+}
+
+function approve(id){
+  var a = approvals.find(function(x){return x.id===id;});
+  if(a){a.status='approved';a.step=4;}
+  updB(); renderA(); toast('Request approved!');
+}
+function reject(id){
+  approvals = approvals.filter(function(x){return x.id!==id;});
+  updB(); renderA(); toast('Request rejected and removed.');
+}
+function updB(){
+  var n = approvals.filter(function(a){return a.status==='pending'||a.status==='review';}).length;
+  document.getElementById('nbadge').textContent = n;
+  var dp = document.getElementById('dp'); if(dp) dp.textContent = n;
+}
+function setF(f,btn){
+  cf = f;
+  ['fa','fp','fr','fap'].forEach(function(id){
+    var el = document.getElementById(id);
+    el.className = 'btn';
+  });
+  btn.className = 'btn btn-primary';
+  renderA();
+}
+
+function nav(page, el){
+  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('on');});
+  el.classList.add('on');
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('pg-'+page).classList.add('on');
+  var labels = {dash:'Dashboard',approvals:'Approvals',budget:'Budget',expenses:'Expenses',reports:'Reports'};
+  document.getElementById('ptitle').textContent = labels[page]||page;
+  if(page==='approvals') renderA();
+}
+
+function addBL(){
+  var dept = document.getElementById('bdept').value;
+  var amt = parseFloat(document.getElementById('bamt').value)||0;
+  if(!amt){toast('Please enter a valid amount.');return;}
+  var bl = document.getElementById('blines');
+  var r = document.createElement('div'); r.className='trow';
+  r.innerHTML='<div style="font-weight:500">'+dept+'</div><div class="trow-label">New line · Q2</div><div class="trow-val">$'+amt.toLocaleString()+'</div>';
+  bl.appendChild(r);
+  document.getElementById('bamt').value='';
+  toast('Budget line added!');
+}
+
+function submitExp(){
+  var desc = document.getElementById('edesc').value.trim();
+  var amt = parseFloat(document.getElementById('eamt').value)||0;
+  var dept = document.getElementById('edept').value;
+  if(!desc||!amt){toast('Please fill in all fields.');return;}
+  var colors = {'Engineering':'#3b82f6','Marketing':'#f59e0b','Operations':'#a78bfa','HR':'#22c55e','Finance':'#ef4444'};
+  var el = document.getElementById('elist');
+  var r = document.createElement('div'); r.className='trow';
+  r.innerHTML='<div style="display:flex;align-items:center;gap:8px"><div class="dept-dot" style="background:'+(colors[dept]||'#888')+'"></div><div><div style="font-weight:500">'+desc+'</div><div class="trow-label">'+dept+'</div></div></div><div style="text-align:right"><div class="trow-val">$'+amt.toLocaleString()+'</div><span class="pill pi">Pending</span></div>';
+  el.prepend(r);
+  approvals.push({id:Date.now(),title:desc,dept:dept,amount:amt,status:'pending',by:'You',steps:['Submitted','Manager','Finance','CFO'],step:1,desc:desc});
+  updB();
+  document.getElementById('edesc').value='';
+  document.getElementById('eamt').value='';
+  toast('Expense submitted for approval!');
+}
+
+function toast(msg){
+  var t = document.getElementById('tst');
+  t.textContent = msg; t.style.display='block';
+  setTimeout(function(){t.style.display='none';},2500);
+}
+
+renderA();
+</script>
+</body>
+</html>
